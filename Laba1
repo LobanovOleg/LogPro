@@ -1,1 +1,73 @@
+% Реализация стандартных предикатов обработки списков
+
+% Длина списка
+% (список, длина)
+Length([], 0).
+Length([_ | L], N):-Length(L, M), N is M + 1.
+
+% Принадлежность элемента списку
+% (элемент, список)
+Member(El, [El | _]).
+Member(El, [_ | Tail]):-Member(El, Tail).
+
+% Конкатeнация списков
+% (список1, список2, список1+2)
+Append([], L, L).
+Append([X | L1], L2, [X | L3]):-Append(L1, L2, L3).
+
+% Удаление элемента из списка
+% (элемент, список, список без элемента)
+Delete(X, [X | T], T).
+Delete(X, [Y | T], [Y | Z]):-Delete(X, T, Z).
+
+% Перестановки элементов в списке
+% (список, перестановка)
+Perm([], []).
+Perm(L, [X | T]):-Delete(X, L, Y), Permutation(Y, T).
+
+% Подсписки списка
+% (подсписок, список)
+Sublist(S, L):-Append(_, L1, L), Append(S, _, L1).
+
+% Удаление последнего элемента в списке
+% (список, список без последнего элемента)
+DeleteLast(L1, L2):-append(L2, [_], L1).
+
+% Удаление последнего элемента в списке (без стандартных предикатов)
+% (список, список без последнего элемента)
+DeleteLastWithoutStandard([_], []).
+DeleteLastWithoutStandard([X | Y], [X | Z]):-DeleteLast(Y, Z).
+
+% Удаление последнего элемента в списке (для порядкового представления)
+% (список, список без последнего элемента)
+
+DeleteLastOrdinalRepresentation(N, [e(N, _) | T], T).
+DeleteLastOrdinalRepresentation(N, [e(M, X) | T], [e(M, X) | Z]):-DeleteLastOrdinalRepresentation(N, T, Z).
+DeleteLastOrdinalRepresentation(L1, L2):-length(L1, N), DeleteLastOrdinalRepresentation(N, L1, L2).
+
+% Перемножение элементов в списке
+% (список, результат)
+
+ListMul([], 0).
+ListMul([H], H).
+ListMul(L, N):-append([_], L1, L), append([E], L1, L), ListMul(L1, P), N is E * P.
+
+% Перемножение элементов в списке (без стандартных предикатов)
+% (список, результат)
+ListMulWithoutStandard([], 0).
+ListMulWithoutStandard([H], H).
+ListMulWithoutStandard([H | T], N):-ListMul(T, P), N is H * P.
+
+% Перемножение элементов в списке (для порядкового представления)
+% (список, результат)
+
+ListMulOrdinalRepresentation([], 0).
+ListMulOrdinalRepresentation([e(_, X)], X).
+ListMulOrdinalRepresentation([e(_, X) | T], N):-ListMulOrdinalRepresentation(T, P), N is X * P.
+
+% Пример совместного использования предикатов
+
+IsPalindrome([]).
+IsPalindrome([_]).
+IsPalindrome([H | T]):-DeleteLast(T, L1), Append(L1, [E], T), E == H, IsPalindrome(L1).
 
